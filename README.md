@@ -1,5 +1,7 @@
 # TimeTracer
-![Travis (.com)](https://img.shields.io/travis/com/LykaiosNZ/TimeTracer)
+![Travis (.com)](https://img.shields.io/travis/com/LykaiosNZ/TimeTracer) 
+![Nuget](https://img.shields.io/nuget/v/TraceTimer) 
+![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/TraceTimer)
 
 A small library for quickly adding timing metrics to sections of code.
 
