@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace TimeTracer
@@ -15,11 +13,9 @@ namespace TimeTracer
             Name = name;
         }
 
-        public string Name { get; }
-
-        public TimeSpan Elapsed => TimeSpan.FromTicks(_elapsedTicks);
-
         public int Count => _count;
+        public string Name { get; }
+        public TimeSpan TotalDuration => TimeSpan.FromTicks(_elapsedTicks);
 
         public void AddTicks(long incrementBy)
         {
