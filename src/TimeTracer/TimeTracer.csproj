@@ -1,7 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Ben Simpson</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>A small library for quickly adding timing metrics to sections of code.</Description>
+    <Version>1.0.0-alpha</Version>
+    <Company />
+    <RepositoryUrl>https://github.com/LykaiosNZ/TimeTracer</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2019 Ben Simpson</Copyright>
+    <PackageProjectUrl>https://github.com/LykaiosNZ/TimeTracer</PackageProjectUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
 </Project>
