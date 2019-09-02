@@ -1,8 +1,7 @@
+before_script: cd src
 language: csharp
-solution: src/TimeTracer.sln
-install:
-  - nuget restore src/TimeTracer.sln
-  - nuget install NUnit.Console -Version 3.10.0 -OutputDirectory testrunner
+mono: none
+dotnet: 2.2.401
 script:
-  - msbuild /p:Configuration=Release src/TimeTracer.sln
-  - mono ./testrunner/NUnit.ConsoleRunner.3.10.0/tools/nunit3-console.exe src/TimeTracer.Tests/bin/Release/netcoreapp2.1/TimeTracer.Tests.dll
+ - dotnet restore
+ - dotnet test
