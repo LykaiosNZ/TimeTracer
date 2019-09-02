@@ -5,7 +5,7 @@
     <Authors>Ben Simpson</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>A small library for quickly adding timing metrics to sections of code.</Description>
-    <Version>1.0.0-alpha</Version>
+    <Version>1.0.0</Version>
     <Company />
     <RepositoryUrl>https://github.com/LykaiosNZ/TimeTracer</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
