@@ -1,5 +1,5 @@
 # TimeTracer
-![Travis (.com)](https://img.shields.io/travis/com/LykaiosNZ/TimeTracer) 
+![Travis (.com)](https://img.shields.io/travis/com/LykaiosNZ/TimeTracer/master) 
 ![Nuget](https://img.shields.io/nuget/v/TimeTracer) 
 ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/TimeTracer)
 
