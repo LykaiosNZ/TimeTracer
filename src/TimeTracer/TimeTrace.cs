@@ -57,7 +57,7 @@ namespace TimeTracer
         /// <param name="name">Name of the scope.</param>
         /// <returns>An <see cref="IDisposable"/> respresenting the scope if a current tracer exists and timing is enabled, otherwise null.</returns>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null, empty or whitespace.</exception>
-        public static IDisposable BeginScope(string name)
+        public static ITraceScope BeginScope(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
