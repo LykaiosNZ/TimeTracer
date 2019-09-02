@@ -5,7 +5,7 @@ namespace TimeTracer
 {
     public class ScopeMetrics : IScopeMetrics
     {
-        private readonly object _lockObj;
+        private readonly object _lockObj = new object();
         private long _totalTicks;
 
         /// <summary>
