@@ -1,2 +1,7 @@
+before_script: cd src
 language: csharp
-solution: src/TimeTracer.sln
+mono: none
+dotnet: 2.2.401
+script:
+ - dotnet restore
+ - dotnet test

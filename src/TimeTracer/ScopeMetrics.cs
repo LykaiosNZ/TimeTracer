@@ -3,9 +3,9 @@ using System.Threading;
 
 namespace TimeTracer
 {
-    internal class ScopeMetrics : IScopeMetrics
+    public class ScopeMetrics : IScopeMetrics
     {
-        private readonly object _lockObj;
+        private readonly object _lockObj = new object();
         private long _totalTicks;
 
         /// <summary>
