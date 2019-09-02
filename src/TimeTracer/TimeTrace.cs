@@ -75,45 +75,128 @@ namespace TimeTracer
         /// <summary>
         /// Disposes the current tracer instance and restores the previous one.
         /// </summary>
-        public void Dispose()
+        public void Dispose() => Dispose(true);
+
+        /// <summary>
+        /// Creates a new scope within the trace.
+        /// </summary>
+        /// <param name="name">Name of the scope.</param>
+        /// <returns>A new trace scope.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null, empty or whitespace.</exception>
+        protected virtual TraceScope CreateNewScope(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(nameof(name));
+            }
+
+            return new TraceScope(this, name);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
             {
                 return;
             }
 
-            _stopwatch.Stop();
-            _current.Value = _previous;
+            if (disposing)
+            {
+                _stopwatch.Stop();
+                _current.Value = _previous;
+                _currentScope.Value?.Dispose();
+            }
 
             _disposed = true;
         }
 
-        private TraceScope CreateNewScope(string name)
+        /// <summary>
+        /// Called when a child scope is created.
+        /// </summary>
+        /// <param name="scope">The created scope.</param>
+        protected virtual void OnScopeCreated(ITraceScope scope)
         {
-            TraceScope currentScope = _currentScope.Value;
-
-            var newScope = new TraceScope(currentScope, _stopwatch.ElapsedTicks, name, OnScopeDisposed);
-
-            _currentScope.Value = newScope;
-
-            return newScope;
         }
 
-        private void OnScopeDisposed(TraceScope scope)
+        /// <summary>
+        /// Called when a child scope is disposed.
+        /// </summary>
+        /// <param name="scope">The disposed scope.</param>
+        protected virtual void OnScopeDisposed(ITraceScope scope)
         {
-            long endTicks = _stopwatch.ElapsedTicks;
-            long elapsedTicks = endTicks - scope.StartTicks;
-
-            UpdateMetrics(scope.PrefixedName, elapsedTicks);
-
-            _currentScope.Value = scope.Parent;
         }
 
-        private void UpdateMetrics(string prefixedName, long elapsedTicks)
+        /// <summary>
+        /// Updates the metrics for a scope.
+        /// </summary>
+        /// <param name="scopeName">Name of the scope.</param>
+        /// <param name="elapsedTicks">Elapsed ticks.</param>
+        protected void UpdateMetrics(string scopeName, long elapsedTicks)
         {
-            ScopeMetrics metric = _metrics.GetOrAdd(prefixedName, key => new ScopeMetrics(key));
+            ScopeMetrics metric = _metrics.GetOrAdd(scopeName, key => new ScopeMetrics(key));
 
             metric.Add(elapsedTicks);
+        }
+
+        protected class TraceScope : ITraceScope
+        {
+            private readonly string _name;
+            private readonly long _startTicks;
+            private readonly TimeTrace _trace;
+
+            private bool _disposed;
+            private long? _endTicks;
+
+            /// <summary>
+            /// Initialises a new instance of the <see cref="TraceScope"/> class.
+            /// </summary>
+            /// <param name="trace">Trace that the scope belongs to.</param>
+            /// <param name="name">Name of the scope.</param>
+            public TraceScope(TimeTrace trace, string name)
+            {
+                _name = name;
+                _startTicks = trace._stopwatch.ElapsedTicks;
+                _trace = trace;
+                Parent = trace._currentScope.Value;
+                trace._currentScope.Value = this;
+                trace.OnScopeCreated(this);
+            }
+
+            /// <inheritdoc />
+            public TimeSpan Duration => TimeSpan.FromTicks(ElapsedTicks);
+
+            /// <summary>
+            /// Gets the stopwatch ticks since the scope was created.
+            /// </summary>
+            public long ElapsedTicks => (_endTicks ?? _trace._stopwatch.ElapsedTicks) - _startTicks;
+
+            /// <inheritdoc />
+            public string Name => Parent != null ? $"{Parent.Name}/{_name}" : _name;
+
+            /// <summary>
+            /// Gets the parent scope.
+            /// </summary>
+            public TraceScope Parent { get; }
+
+            public void Dispose() => Dispose(true);
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                if (disposing)
+                {
+                    _endTicks = _trace._stopwatch.ElapsedTicks;
+                    _trace.UpdateMetrics(Name, ElapsedTicks);
+                    _trace._currentScope.Value = Parent;
+                    _trace.OnScopeDisposed(this);
+                }
+
+                _disposed = true;
+            }
         }
     }
 }
