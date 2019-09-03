@@ -1,4 +1,4 @@
-# TimeTracer
+# TimeTracer ⏱🖊
 ![Travis (.com)](https://img.shields.io/travis/com/LykaiosNZ/TimeTracer/master) 
 ![Nuget](https://img.shields.io/nuget/v/TimeTracer) 
 ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/TimeTracer)
@@ -61,8 +61,13 @@ using (var trace = new TimeTrace())
 // Scope: ParentScope, Duration: [...], CallCount: 1
 // Scope: ParentScope/ChildScope, Duration: [...], CallCount: 2
 ```
+
+## Building
+Building is as simple as: `dotnet build`
+
 ## Credits
-* Unit tests powered by [NUnit](https://github.com/nunit)
+* [NUnit](https://github.com/nunit) - Powers the unit tests.
+* [Fluent Assertions](https://github.com/fluentassertions/fluentassertions) - Helps out with the unit tests.
 
 ## Licence
 Licenced under the terms of the [MIT Licence](https://opensource.org/licenses/MIT)
