@@ -19,6 +19,13 @@ Console.WriteLine($"Execution took {stopwatch.ElapsedMilliseconds}ms");
 
 ... then this is the library for you!
 
+## Why?
+There are, of course, many great libraries for collecting metrics that already exist, as well as profilers and the aforementioned trusty `Stopwatch`. The intent of this library is to provide more functionality than `Stopwatch`, while still being incredibly easy to get up and running. 
+
+It provides two simple metrics for instrumented sections of code (scopes): the aggregate duration of all calls of the scope, and the number of calls made. Scopes can be nested, and the collected metrics provide information about the scope hierarchy.
+
+Using the power of `AsyncLocal<T>`, scopes can be created using static methods and have their metrics fed back to a single `TimeTrace` instance in a thread- and async-safe manner, without having to inject the instance into every class that you want collect metrics for.
+
 ## Installation
 Simply install the NuGet package and you're ready to go:
 
