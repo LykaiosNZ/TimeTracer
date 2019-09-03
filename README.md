@@ -19,6 +19,11 @@ Console.WriteLine($"Execution took {stopwatch.ElapsedMilliseconds}ms");
 
 ... then this is the library for you!
 
+## Installation
+Simply install the NuGet package and you're ready to go:
+
+`install-package TimeTracer`
+
 ## Usage
 ```csharp
 // Create a new trace to capture timing metrics
