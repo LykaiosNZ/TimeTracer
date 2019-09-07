@@ -33,11 +33,13 @@ namespace TimeTracer
         /// Initialises a new instance of the <see cref="TimeTrace"/> class using a specified timer.
         /// </summary>
         /// <param name="timer">Timer to use for measurements.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timer"/> is null.</exception>
         public TimeTrace(ITraceTimer timer)
         {
+            // Make sure that any exceptions are thrown *before* overwriting any AsyncLocal<T> values.
+            _timer = timer ?? throw new ArgumentNullException(nameof(timer));
             _previous = _current.Value;
             _current.Value = this;
-            _timer = timer;
             _timer.Start();
         }
 
@@ -71,7 +73,7 @@ namespace TimeTracer
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("Cannot be null or empty", nameof(name));
+                throw new ArgumentException("Cannot be null, empty or whitespace.", nameof(name));
             }
 
             if (!Enabled || _current.Value == null)
