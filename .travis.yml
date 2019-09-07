@@ -1,7 +1,5 @@
-before_script: cd src
 language: csharp
 mono: none
 dotnet: 2.2.401
 script:
- - dotnet restore
- - dotnet test
+ - build.sh
