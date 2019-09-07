@@ -1,3 +1,5 @@
+before_install:
+  - chmod +x build.sh
 language: csharp
 mono: none
 dotnet: 2.2.401
