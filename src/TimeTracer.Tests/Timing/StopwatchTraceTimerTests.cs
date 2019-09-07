@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
+using System;
+using System.Diagnostics;
 using System.Threading;
 using TimeTracer.Timing;
 
@@ -11,6 +13,8 @@ namespace TimeTracer.Tests.Timing
         [Test]
         public void Elapsed_And_ElapsedNanoseconds_ShouldBeEquivalent()
         {
+            var stopwatchNanosecondsPerTick = 1_000_000_000L / Stopwatch.Frequency;
+            var timeSpanNanosecondsPerTick = 1_000_000_000L / TimeSpan.TicksPerSecond;
             var timer = new StopwatchTraceTimer();
 
             timer.Start();
@@ -19,7 +23,13 @@ namespace TimeTracer.Tests.Timing
 
             timer.Stop();
 
-            timer.ElapsedNanoseconds.Should().Be((long)(timer.Elapsed.TotalMilliseconds * 1_000_000D));
+            var timeSpanNanoseconds = timer.Elapsed.TotalMilliseconds * 1_000_000D;
+
+            var delta = stopwatchNanosecondsPerTick == timeSpanNanosecondsPerTick
+                ? 0
+                : (ulong)(Math.Max(stopwatchNanosecondsPerTick / timeSpanNanosecondsPerTick, timeSpanNanosecondsPerTick / stopwatchNanosecondsPerTick));
+
+            timer.ElapsedNanoseconds.Should().BeCloseTo((long)(timeSpanNanoseconds), delta);
         }
 
         [Test]

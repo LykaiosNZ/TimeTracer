@@ -8,14 +8,14 @@ namespace TimeTracer.Timing
     /// </summary>
     public class StopwatchTraceTimer : ITraceTimer
     {
-        private static readonly long Factor = 1_000_000_000L / Stopwatch.Frequency;
+        private static readonly long NanosecondsPerTick = 1_000_000_000L / Stopwatch.Frequency;
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
         /// <inheritdoc/>
         public TimeSpan Elapsed => _stopwatch.Elapsed;
 
         /// <inheritdoc/>
-        public long ElapsedNanoseconds => _stopwatch.ElapsedTicks * Factor;
+        public long ElapsedNanoseconds => _stopwatch.ElapsedTicks * NanosecondsPerTick;
 
         /// <inheritdoc/>
         public void Start() => _stopwatch.Start();

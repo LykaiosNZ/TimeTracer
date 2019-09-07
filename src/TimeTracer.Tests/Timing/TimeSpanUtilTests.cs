@@ -9,19 +9,17 @@ namespace TimeTracer.Tests.Timing
     public class TimeSpanUtilTests
     {
         [Test]
-        public void FromNanoseconds()
+        [TestCase(0)]
+        [TestCase(long.MaxValue)]
+        [TestCase(long.MinValue)]
+        public void FromNanoseconds(long nanoseconds)
         {
-            var timeSpan = TimeSpanUtil.FromNanoseconds(1_000_000);
+            var milliseconds = nanoseconds / 1_000_000D;
 
-            timeSpan.TotalMilliseconds.Should().Be(1);
-        }
+            var expected = TimeSpan.FromMilliseconds(milliseconds);
+            var timeSpan = TimeSpanUtil.FromNanoseconds(nanoseconds);
 
-        [Test]
-        public void FromNanoseconds_ValueIsZero()
-        {
-            var timeSpan = TimeSpanUtil.FromNanoseconds(0);
-
-            timeSpan.Should().Be(TimeSpan.Zero);
+            timeSpan.Should().Be(expected);
         }
     }
 }
