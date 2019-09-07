@@ -82,7 +82,7 @@ namespace TimeTracer.Tests
                 var metric = trace.Metrics.Single();
 
                 metric.Count.Should().Be(1);
-                metric.TotalDuration.Should().BeGreaterOrEqualTo(TimeSpan.FromMilliseconds(500));
+                metric.TotalDuration.Should().BeCloseTo(TimeSpan.FromMilliseconds(500), precision: 1);
             }
         }
 
