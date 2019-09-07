@@ -20,6 +20,19 @@ namespace TimeTracer.Tests
         }
 
         [Test]
+        public void Add_ValueIsNegative_ThrowsException()
+        {
+            var metrics = new ScopeMetrics("Test");
+
+            Action act = () => metrics.Add(-1);
+
+            var exception = act.Should().Throw<ArgumentOutOfRangeException>();
+
+            exception.Which.ParamName.Should().Be("elapsedNs");
+            exception.Which.ActualValue.Should().Be(-1);
+        }
+
+        [Test]
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]

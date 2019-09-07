@@ -5,12 +5,12 @@ namespace TimeTracer.Timing
     public interface ITraceTimer
     {
         /// <summary>
-        /// Gets the total elapsed time measured by the current instance. 
+        /// Gets the total elapsed time measured by the current instance.
         /// </summary>
         TimeSpan Elapsed { get; }
 
         /// <summary>
-        /// Gets the total elapsed time measured by the current instance, measured in nanoseconds. 
+        /// Gets the total elapsed time measured by the current instance, measured in nanoseconds.
         /// </summary>
         long ElapsedNanoseconds { get; }
 

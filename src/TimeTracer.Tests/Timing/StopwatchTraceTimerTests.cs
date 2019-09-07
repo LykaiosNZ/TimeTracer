@@ -64,9 +64,9 @@ namespace TimeTracer.Tests.Timing
             var afterSecondStop = timer.ElapsedNanoseconds;
 
             initialTimeNs.Should().Be(0, "the timer should remain at 0 until started.");
-            afterFirstStop1.Should().BeGreaterThan(initialTimeNs, "the timer should increment while running");
-            afterFirstStop2.Should().Be(afterFirstStop1, "the timer should not increment while stopped");
-            afterSecondStop.Should().BeGreaterThan(afterFirstStop2, "the timer should increment while running");
+            afterFirstStop1.Should().BeGreaterThan(initialTimeNs, "the timer should increment while running.");
+            afterFirstStop2.Should().Be(afterFirstStop1, "the timer should not increment while stopped.");
+            afterSecondStop.Should().BeGreaterThan(afterFirstStop2, "the timer should increment while running.");
         }
     }
 }
