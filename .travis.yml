@@ -1,5 +1,7 @@
 language: csharp
 mono: none
 dotnet: 2.2.401
-before_script: dotnet tool install --global Cake.Tool --version 0.34.1
+before_script: 
+  - export PATH=$PATH:/home/travis/.dotnet/tools
+  - dotnet tool install --global Cake.Tool --version 0.34.1
 script: dotnet-cake
