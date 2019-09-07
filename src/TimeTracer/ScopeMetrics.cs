@@ -33,8 +33,8 @@ namespace TimeTracer
         /// <summary>
         /// Adds information about a scope instance to the metrics.
         /// </summary>
-        /// <param name="elapsedTicks">Duration of the scope.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="elapsedTicks"/> is less than 0.</exception>
+        /// <param name="elapsedNs">Duration of the scope in nanoseconds.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="elapsedNs"/> is less than 0.</exception>
         public void Add(long elapsedNs)
         {
             if (elapsedNs < 0)

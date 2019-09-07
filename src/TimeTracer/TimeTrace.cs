@@ -140,7 +140,7 @@ namespace TimeTracer
         /// Updates the metrics for a scope.
         /// </summary>
         /// <param name="scopeName">Name of the scope.</param>
-        /// <param name="elapsedNs">Elapsed ticks.</param>
+        /// <param name="elapsedNs">Scope duration in nanoseconds.</param>
         protected void UpdateMetrics(string scopeName, long elapsedNs)
         {
             ScopeMetrics metric = _metrics.GetOrAdd(scopeName, key => new ScopeMetrics(key));
@@ -176,7 +176,7 @@ namespace TimeTracer
             public TimeSpan Duration => TimeSpanUtil.FromNanoseconds(ElapsedNanoseconds);
 
             /// <summary>
-            /// Gets the stopwatch ticks since the scope was created.
+            /// Gets the time since the scope was created, in nanoseconds.
             /// </summary>
             public long ElapsedNanoseconds => (_endNs ?? _trace._timer.ElapsedNanoseconds) - _startNs;
 
