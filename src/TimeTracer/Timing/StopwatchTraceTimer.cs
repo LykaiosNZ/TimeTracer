@@ -6,6 +6,7 @@ namespace TimeTracer.Timing
     /// <summary>
     /// Trace timer that uses a stopwatch to keep track of elapsed time.
     /// </summary>
+    [DebuggerDisplay("Elapsed: {Elapsed}")]
     public class StopwatchTraceTimer : ITraceTimer
     {
         private static readonly long NanosecondsPerTick = 1_000_000_000L / Stopwatch.Frequency;

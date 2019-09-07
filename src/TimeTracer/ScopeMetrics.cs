@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using TimeTracer.Timing;
 
 namespace TimeTracer
 {
+    [DebuggerDisplay("Scope Name: {Name}, Total Duration: {TotalDuration}, Call Count: {Count}")]
     public class ScopeMetrics : IScopeMetrics
     {
         private readonly object _lockObj = new object();

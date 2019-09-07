@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using TimeTracer.Timing;
@@ -10,6 +11,7 @@ namespace TimeTracer
     /// <summary>
     /// Provides functionality for instrumenting sections of code.
     /// </summary>
+    [DebuggerDisplay("Metrics: {_metrics.Count}, Total Duration: {TotalDuration}")]
     public class TimeTrace : IDisposable
     {
         private static readonly AsyncLocal<TimeTrace> _current = new AsyncLocal<TimeTrace>();
@@ -150,6 +152,7 @@ namespace TimeTracer
             metric.Add(elapsedNs);
         }
 
+        [DebuggerDisplay("Name: {Name}, Duration: {Duration}")]
         protected class TraceScope : ITraceScope
         {
             private readonly string _name;
