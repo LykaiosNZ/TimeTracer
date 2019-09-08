@@ -11,7 +11,7 @@ namespace TimeTracer.Formatting
                 throw new ArgumentNullException(nameof(scope));
             }
 
-            return $"Scope {scope.Name} Created";
+            return $"{scope.Name} Created";
         }
 
         public string FormatDisposedMessage(ITraceScope scope)
@@ -21,7 +21,7 @@ namespace TimeTracer.Formatting
                 throw new ArgumentNullException(nameof(scope));
             }
 
-            return $"Scope {scope.Name} Disposed";
+            return $"{scope.Name} Disposed";
         }
     }
 }

@@ -11,7 +11,7 @@ namespace TimeTracer.Formatting
                 throw new ArgumentNullException(nameof(metrics));
             }
 
-            return $"Scope {metrics.Name}: Total Time Elapsed {metrics.TotalDuration}, Creation Count {metrics.Count}";
+            return $"Scope: {metrics.Name}, Total Duration: {metrics.TotalDuration}, Count: {metrics.Count}";
         }
     }
 }

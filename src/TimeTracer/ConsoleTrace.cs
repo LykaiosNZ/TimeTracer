@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TimeTracer.Formatting;
 
 namespace TimeTracer
@@ -29,6 +30,8 @@ namespace TimeTracer
         {
             _metricFormatter = metricFormatter;
             _scopeFormatter = scopeFormatter;
+
+            WriteMessage("TRACE", "Created");
         }
 
         protected override void Dispose(bool disposing)
@@ -42,14 +45,15 @@ namespace TimeTracer
 
             if (_metricFormatter != null)
             {
-                foreach (var metric in Metrics)
-                {
-                    Console.WriteLine(_metricFormatter.FormatMessage(metric));
-                }
+                WriteMetrics(Metrics);
             }
+
+            WriteMessage("TRACE", $"Disposed. Total Duration: {TotalDuration}");
 
             _disposed = true;
         }
+
+        protected virtual string FormatMessage(string title, string message) => $"[TimeTrace] {title} - {message}";
 
         protected override void OnScopeCreated(ITraceScope scope)
         {
@@ -60,7 +64,9 @@ namespace TimeTracer
                 return;
             }
 
-            Console.WriteLine(_scopeFormatter.FormatCreatedMessage(scope));
+            var formattedMessage = _scopeFormatter.FormatCreatedMessage(scope);
+
+            WriteMessage("SCOPE", formattedMessage);
         }
 
         protected override void OnScopeDisposed(ITraceScope scope)
@@ -72,7 +78,26 @@ namespace TimeTracer
                 return;
             }
 
-            Console.WriteLine(_scopeFormatter.FormatDisposedMessage(scope));
+            var formattedMessage = _scopeFormatter.FormatDisposedMessage(scope);
+
+            WriteMessage("SCOPE", formattedMessage);
+        }
+
+        protected void WriteMessage(string title, string message)
+        {
+            var formattedMessage = FormatMessage(title, message);
+
+            Console.WriteLine(formattedMessage);
+        }
+
+        protected void WriteMetrics(IEnumerable<IScopeMetrics> metrics)
+        {
+            foreach (var metric in Metrics)
+            {
+                var formattedMessage = _metricFormatter.FormatMessage(metric);
+
+                WriteMessage("METRIC", formattedMessage);
+            }
         }
     }
 }
