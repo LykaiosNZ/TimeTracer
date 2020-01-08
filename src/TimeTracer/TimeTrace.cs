@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using TimeTracer.Timing;
 
 namespace TimeTracer
 {
     /// <summary>
     /// Provides functionality for instrumenting sections of code.
     /// </summary>
+    [DebuggerDisplay("Metrics: {_metrics.Count}, Total Duration: {TotalDuration}")]
     public class TimeTrace : IDisposable
     {
         private static readonly AsyncLocal<TimeTrace> _current = new AsyncLocal<TimeTrace>();
@@ -17,18 +19,30 @@ namespace TimeTracer
         private readonly AsyncLocal<TraceScope> _currentScope = new AsyncLocal<TraceScope>();
         private readonly ConcurrentDictionary<string, ScopeMetrics> _metrics = new ConcurrentDictionary<string, ScopeMetrics>();
         private readonly TimeTrace _previous;
-        private readonly Stopwatch _stopwatch;
+        private readonly ITraceTimer _timer;
 
         private bool _disposed;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="TimeTrace"/> class. <see cref="Current"/> will be set to the new instance.
+        /// Initialises a new instance of the <see cref="TimeTrace"/> class using a <see cref="StopwatchTraceTimer"/>. <see cref="Current"/> will be set to the new instance.
         /// </summary>
         public TimeTrace()
+            : this(new StopwatchTraceTimer())
         {
+        }
+
+        /// <summary>
+        /// Initialises a new instance of the <see cref="TimeTrace"/> class using a specified timer.
+        /// </summary>
+        /// <param name="timer">Timer to use for measurements.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="timer"/> is null.</exception>
+        public TimeTrace(ITraceTimer timer)
+        {
+            // Make sure that any exceptions are thrown *before* overwriting any AsyncLocal<T> values.
+            _timer = timer ?? throw new ArgumentNullException(nameof(timer));
             _previous = _current.Value;
             _current.Value = this;
-            _stopwatch = Stopwatch.StartNew();
+            _timer.Start();
         }
 
         /// <summary>
@@ -49,7 +63,7 @@ namespace TimeTracer
         /// <summary>
         /// Gets the total duration the tracer has been running for.
         /// </summary>
-        public TimeSpan TotalDuration => TimeSpan.FromTicks(_stopwatch.ElapsedTicks);
+        public TimeSpan TotalDuration => _timer.Elapsed;
 
         /// <summary>
         /// Begins a new timing scope for the current tracer.
@@ -61,7 +75,7 @@ namespace TimeTracer
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("Cannot be null or empty", nameof(name));
+                throw new ArgumentException("Cannot be null, empty or whitespace.", nameof(name));
             }
 
             if (!Enabled || _current.Value == null)
@@ -83,7 +97,7 @@ namespace TimeTracer
         /// <param name="name">Name of the scope.</param>
         /// <returns>A new trace scope.</returns>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null, empty or whitespace.</exception>
-        protected virtual TraceScope CreateNewScope(string name)
+        protected virtual ITraceScope CreateNewScope(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -93,6 +107,10 @@ namespace TimeTracer
             return new TraceScope(this, name);
         }
 
+        /// <summary>
+        /// Disposes the current tracer instance and restores the previous one.
+        /// </summary>
+        /// <param name="disposing">Indicates whether the object is being disposed by user code.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -102,7 +120,7 @@ namespace TimeTracer
 
             if (disposing)
             {
-                _stopwatch.Stop();
+                _timer.Stop();
                 _current.Value = _previous;
                 _currentScope.Value?.Dispose();
             }
@@ -130,22 +148,26 @@ namespace TimeTracer
         /// Updates the metrics for a scope.
         /// </summary>
         /// <param name="scopeName">Name of the scope.</param>
-        /// <param name="elapsedTicks">Elapsed ticks.</param>
-        protected void UpdateMetrics(string scopeName, long elapsedTicks)
+        /// <param name="elapsedNs">Scope duration in nanoseconds.</param>
+        protected void UpdateMetrics(string scopeName, long elapsedNs)
         {
             ScopeMetrics metric = _metrics.GetOrAdd(scopeName, key => new ScopeMetrics(key));
 
-            metric.Add(elapsedTicks);
+            metric.Add(elapsedNs);
         }
 
+        /// <summary>
+        /// Scope within a trace. Represents a timed block of code.
+        /// </summary>
+        [DebuggerDisplay("Name: {Name}, Duration: {Duration}")]
         protected class TraceScope : ITraceScope
         {
             private readonly string _name;
-            private readonly long _startTicks;
+            private readonly long _startNs;
             private readonly TimeTrace _trace;
 
             private bool _disposed;
-            private long? _endTicks;
+            private long? _endNs;
 
             /// <summary>
             /// Initialises a new instance of the <see cref="TraceScope"/> class.
@@ -155,7 +177,7 @@ namespace TimeTracer
             public TraceScope(TimeTrace trace, string name)
             {
                 _name = name;
-                _startTicks = trace._stopwatch.ElapsedTicks;
+                _startNs = trace._timer.ElapsedNanoseconds;
                 _trace = trace;
                 Parent = trace._currentScope.Value;
                 trace._currentScope.Value = this;
@@ -163,12 +185,12 @@ namespace TimeTracer
             }
 
             /// <inheritdoc />
-            public TimeSpan Duration => TimeSpan.FromTicks(ElapsedTicks);
+            public TimeSpan Duration => TimeSpanUtil.FromNanoseconds(ElapsedNanoseconds);
 
             /// <summary>
-            /// Gets the stopwatch ticks since the scope was created.
+            /// Gets the time since the scope was created, in nanoseconds.
             /// </summary>
-            public long ElapsedTicks => (_endTicks ?? _trace._stopwatch.ElapsedTicks) - _startTicks;
+            public long ElapsedNanoseconds => (_endNs ?? _trace._timer.ElapsedNanoseconds) - _startNs;
 
             /// <inheritdoc />
             public string Name => Parent != null ? $"{Parent.Name}/{_name}" : _name;
@@ -178,8 +200,15 @@ namespace TimeTracer
             /// </summary>
             public TraceScope Parent { get; }
 
+            /// <summary>
+            /// Disposes the scope, stopping timing and reporting the scope metrics back to the parent.
+            /// </summary>
             public void Dispose() => Dispose(true);
 
+            /// <summary>
+            /// Disposes the scope, stopping timing and reporting the scope metrics back to the parent.
+            /// </summary>
+            /// <param name="disposing">Indicates whether the object is being disposed by user code.</param>
             protected virtual void Dispose(bool disposing)
             {
                 if (_disposed)
@@ -189,8 +218,8 @@ namespace TimeTracer
 
                 if (disposing)
                 {
-                    _endTicks = _trace._stopwatch.ElapsedTicks;
-                    _trace.UpdateMetrics(Name, ElapsedTicks);
+                    _endNs = _trace._timer.ElapsedNanoseconds;
+                    _trace.UpdateMetrics(Name, ElapsedNanoseconds);
                     _trace._currentScope.Value = Parent;
                     _trace.OnScopeDisposed(this);
                 }
