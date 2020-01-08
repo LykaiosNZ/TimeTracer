@@ -107,6 +107,10 @@ namespace TimeTracer
             return new TraceScope(this, name);
         }
 
+        /// <summary>
+        /// Disposes the current tracer instance and restores the previous one.
+        /// </summary>
+        /// <param name="disposing">Indicates whether the object is being disposed by user code.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -152,6 +156,9 @@ namespace TimeTracer
             metric.Add(elapsedNs);
         }
 
+        /// <summary>
+        /// Scope within a trace. Represents a timed block of code.
+        /// </summary>
         [DebuggerDisplay("Name: {Name}, Duration: {Duration}")]
         protected class TraceScope : ITraceScope
         {
@@ -193,8 +200,15 @@ namespace TimeTracer
             /// </summary>
             public TraceScope Parent { get; }
 
+            /// <summary>
+            /// Disposes the scope, stopping timing and reporting the scope metrics back to the parent.
+            /// </summary>
             public void Dispose() => Dispose(true);
 
+            /// <summary>
+            /// Disposes the scope, stopping timing and reporting the scope metrics back to the parent.
+            /// </summary>
+            /// <param name="disposing">Indicates whether the object is being disposed by user code.</param>
             protected virtual void Dispose(bool disposing)
             {
                 if (_disposed)

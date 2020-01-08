@@ -2,6 +2,9 @@
 
 namespace TimeTracer.Timing
 {
+    /// <summary>
+    /// Provides timing for traces.
+    /// </summary>
     public interface ITraceTimer
     {
         /// <summary>

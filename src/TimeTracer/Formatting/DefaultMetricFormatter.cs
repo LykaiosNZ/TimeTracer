@@ -2,8 +2,12 @@
 
 namespace TimeTracer.Formatting
 {
+    /// <summary>
+    /// Default trace metric formatter.
+    /// </summary>
     public class DefaultMetricFormatter : IMetricFormatter
     {
+        /// <inheritdoc />
         public string FormatMessage(IScopeMetrics metrics)
         {
             if (metrics == null)

@@ -4,6 +4,9 @@ using TimeTracer.Timing;
 
 namespace TimeTracer
 {
+    /// <summary>
+    /// Metrics for a trace scope.
+    /// </summary>
     [DebuggerDisplay("Scope Name: {Name}, Total Duration: {TotalDuration}, Call Count: {Count}")]
     public class ScopeMetrics : IScopeMetrics
     {

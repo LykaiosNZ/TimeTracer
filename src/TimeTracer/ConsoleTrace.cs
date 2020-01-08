@@ -25,7 +25,7 @@ namespace TimeTracer
         /// Initialise a new instance of the <see cref="ConsoleTrace"/> class using specified formatters.
         /// </summary>
         /// <param name="metricFormatter">Formatter to use for writing metrics. If null, metrics will not be written to the console.</param>
-        /// <param name="scopeFormatter">Formatter to use for writing scope creation information. If null, scope creation/disposal </param>
+        /// <param name="scopeFormatter">Formatter to use for writing scope creation information. If null, scope creation/disposal messages will not be written to the console.</param>
         public ConsoleTrace(IMetricFormatter metricFormatter, IScopeFormatter scopeFormatter)
         {
             _metricFormatter = metricFormatter;
@@ -34,6 +34,7 @@ namespace TimeTracer
             WriteMessage("TRACE", "Created");
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (_disposed)
@@ -53,8 +54,10 @@ namespace TimeTracer
             _disposed = true;
         }
 
+        /// <inheritdoc />
         protected virtual string FormatMessage(string title, string message) => $"[TimeTrace] {title} - {message}";
 
+        /// <inheritdoc />
         protected override void OnScopeCreated(ITraceScope scope)
         {
             base.OnScopeCreated(scope);
@@ -69,6 +72,7 @@ namespace TimeTracer
             WriteMessage("SCOPE", formattedMessage);
         }
 
+        /// <inheritdoc />
         protected override void OnScopeDisposed(ITraceScope scope)
         {
             base.OnScopeDisposed(scope);
@@ -83,6 +87,7 @@ namespace TimeTracer
             WriteMessage("SCOPE", formattedMessage);
         }
 
+        /// <inheritdoc />
         protected void WriteMessage(string title, string message)
         {
             var formattedMessage = FormatMessage(title, message);
@@ -90,6 +95,10 @@ namespace TimeTracer
             Console.WriteLine(formattedMessage);
         }
 
+        /// <summary>
+        /// Writes trace metrics to the console.
+        /// </summary>
+        /// <param name="metrics">Collection of metrics to write.</param>
         protected void WriteMetrics(IEnumerable<IScopeMetrics> metrics)
         {
             foreach (var metric in Metrics)

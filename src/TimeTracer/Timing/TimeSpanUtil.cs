@@ -2,6 +2,9 @@
 
 namespace TimeTracer.Timing
 {
+    /// <summary>
+    /// Utility class for interacting with <see cref="TimeSpan"/>
+    /// </summary>
     public static class TimeSpanUtil
     {
         /// <summary>
